@@ -28,30 +28,61 @@ const Navigation = () => {
             </Button>
             <div className={`slidebar ${isOpenModal ? "active" : ""}`}>
             <ul className="catagory1">
-                <li className="nav-item"><Link to={"/"}><Button><LuApple/>Trái cây & rau quả<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16} /></Button> </Link>
+                <li className="nav-item"><Link to={"/"}><Button>Thực phẩm tươi sống<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16} /></Button> </Link>
                 <div className="subMenu">
                 <Link to={"/"}><Button>Trái cây tươi</Button> </Link>
                 <Link to={"/"}><Button>Rau củ tươi</Button> </Link>
+                <Link to={"/"}><Button>Trứng & sữa</Button> </Link>
+                <Link to={"/"}><Button>Đồ đông lạnh</Button> </Link>
                 </div>
                 </li>
-                <li className="nav-item"><Link to={"/"}><Button><LuBeef/>Thịt & hải sản</Button> </Link></li>
-                <li className="nav-item"><Link to={"/"}><Button><LuCoffee/>Đồ uống<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link>
+                <li className="nav-item"><Link to={"/"}><Button>Đồ uống<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link>
                 <div className="subMenu">
-                <Link to={"/"}><Button>Cà phê</Button> </Link>
-                <Link to={"/"}><Button>Sữa</Button> </Link>
-                <Link to={"/"}><Button>Nước</Button> </Link>
-                <Link to={"/"}><Button>Soda & nước ngọt</Button> </Link>
-                <Link to={"/"}><Button>Bia & Rượu </Button> </Link>
-
+                <Link to={"/"}><Button>Sữa và các sản phẩm từ sữa</Button> </Link>
+                <Link to={"/"}><Button>Cà phê & trà</Button> </Link>
+                <Link to={"/"}><Button>Nước khoáng & nước ép trái cây</Button> </Link>
+                <Link to={"/"}><Button>Đồ uống có cồn</Button> </Link>
                 </div>
+                </li>
+                <li className="nav-item"><Link to={"/"}><Button>Hóa mỹ phẩm<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> 
+                <div className="subMenu">
+                <Link to={"/"}><Button>Chăm sóc cá nhân</Button> </Link>
+                <Link to={"/"}><Button>Mỹ phẩm </Button> </Link>
+                <Link to={"/"}><Button>Chăm sóc tóc</Button> </Link>
+                <Link to={"/"}><Button>Chăm sóc da</Button> </Link>
+                <Link to={"/"}><Button>Nước hoa & khử mùi</Button> </Link>
+                </div>
+                </Link>
                 
                 </li>
-                <li className="nav-item"><Link to={"/"}><Button><LuSnowflake/>Thực phẩm đông lạnh</Button> </Link></li>
-                <li className="nav-item"><Link to={"/"}><Button><LuCookie/>Bánh quy & Snack</Button> </Link></li>
+                <li className="nav-item"><Link to={"/"}><Button>đóng gói & chế biến sẵn<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link>
+                <div className="subMenu">
+                <Link to={"/"}><Button>Mì gói & phở ăn liền</Button> </Link>
+                <Link to={"/"}><Button>Đồ hộp & thực phẩm đóng gói</Button> </Link>
+                <Link to={"/"}><Button>Nước</Button> </Link>
+                <Link to={"/"}><Button>Bánh kẹo & snack</Button> </Link>
+                <Link to={"/"}><Button>Ngũ cốc & bột ăn liền</Button> </Link>
+                </div>
+                </li>
+                <li className="nav-item"><Link to={"/"}><Button>Sản phẩm cho mẹ và bé<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link>
+                <div className="subMenu">
+                <Link to={"/"}><Button>Sữa bộ & sữa công thức</Button> </Link>
+                <Link to={"/"}><Button>Tã, bỉm & khăn ướt</Button> </Link>
+                <Link to={"/"}><Button>Đồ ăn dặm</Button> </Link>
+                <Link to={"/"}><Button>Đồ chơi trẻ em</Button> </Link>
+                </div>
+                </li>
+                <li className="nav-item"><Link to={"/"}><Button>Đồ gia dụng<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link>
+                <div className="subMenu">
+                <Link to={"/"}><Button>Dụng cụ nhà bếp</Button> </Link>
+                <Link to={"/"}><Button>Vệ sinh nhà cửa</Button> </Link>
+                <Link to={"/"}><Button>Đồ dùng phòng tắm</Button> </Link>
+                </div>
+                </li>
               </ul>
               <ul className="catagory2">
-                <li className="nav-item"><Link to={"/"}><Button>Sản phẩm bán chạy</Button> </Link></li>
-                <li className="nav-item"><Link to={"/"}><Button>Sản phẩm mới</Button> </Link></li>
+                <li className="nav-item"><Link to={"/"}><Button>Sản phẩm bán chạy<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link></li>
+                <li className="nav-item"><Link to={"/"}><Button>Sản phẩm mới<GrFormNext style={{ marginLeft: "auto", opacity: 0.9 }} size={16}/></Button> </Link></li>
               </ul>
             </div>
             </div>

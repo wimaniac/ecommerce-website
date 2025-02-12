@@ -6,7 +6,7 @@ import Header from './Components/Header';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Footer from "./Components/Footer";
-
+import Listing from "./Pages/Listing";
 const MyContext = React.createContext();
 function App() {
   const [cityList, setcityList] = useState([]);
@@ -31,6 +31,7 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/cat/:id" exact={true} element={<Listing />} />
         </Routes>
         <Footer/>
       </MyContext.Provider>  
