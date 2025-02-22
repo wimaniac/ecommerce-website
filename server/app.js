@@ -9,10 +9,10 @@ app.use(cors());
 app.options("*", cors());
 
 //Middleware
-app.use(express.json()); 
+app.use(express.json());
 
 //routes
-const categoryRoutes = require('./routers/category')
+const categoryRoutes = require("./routers/category");
 app.use("/api/categories", categoryRoutes);
 //database
 mongoose
@@ -31,4 +31,3 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
