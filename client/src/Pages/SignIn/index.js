@@ -35,8 +35,9 @@ const SignIn = () => {
                 {activeForm === "login" && (
                   <div className="login-form">
                     <form>
+                    
                       <p>
-                        <label>Email &nbsp; *</label>
+                        <label>Số điện thoại &nbsp; *</label>
                         <input className="d-flex" type="text" />
                       </p>
                       <p>
@@ -76,6 +77,10 @@ const SignIn = () => {
                         <input className="d-flex" type="text" />
                       </p>
                       <p>
+                        <label>Số điện thoại &nbsp; *</label>
+                        <input className="d-flex" type="text" />
+                      </p>
+                      <p>
                         <label>Email &nbsp; *</label>
                         <input className="d-flex" type="text" />
                       </p>
@@ -90,7 +95,7 @@ const SignIn = () => {
                         <div className="OSn4Cu"></div>
                       </p>
                       <div className="withGG">
-                        <Button >
+                        <Button>
                             <FcGoogle/>&nbsp; Đăng nhập bằng Google
                         </Button>
                       </div>

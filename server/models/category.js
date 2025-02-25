@@ -5,6 +5,4 @@ const categorySchema = mongoose.Schema({
   subcategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }] // Tham chiếu đến chính nó
 });
 
-const Category = mongoose.model("Category", categorySchema);
-
-module.exports = Category;
+module.exports = mongoose.model("Category", categorySchema);

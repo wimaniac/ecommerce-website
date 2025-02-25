@@ -86,8 +86,8 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ success: false, message: "Không tìm thấy danh mục cha" });
     }
 
-    // Xử lý danh mục con
-    let updatedSubcategories = [];
+    // Lấy danh mục con hiện có
+    let updatedSubcategories = [...parentCategory.subcategories];
 
     for (const sub of subcategories) {
       let existingSubcategory = await Category.findOne({ name: sub.name });
@@ -98,10 +98,13 @@ router.put("/:id", async (req, res) => {
         await existingSubcategory.save();
       }
 
-      updatedSubcategories.push(existingSubcategory._id);
+      // Chỉ thêm nếu chưa có trong danh mục con
+      if (!updatedSubcategories.includes(existingSubcategory._id)) {
+        updatedSubcategories.push(existingSubcategory._id);
+      }
     }
 
-    // Cập nhật danh mục cha
+    // Cập nhật danh mục cha với danh mục con hợp nhất
     parentCategory.name = name;
     parentCategory.subcategories = updatedSubcategories;
     await parentCategory.save();
@@ -114,6 +117,7 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
   }
 });
+
 
 
 // Xóa danh mục theo ID
