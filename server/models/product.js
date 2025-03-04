@@ -6,15 +6,16 @@ const productSchema = mongoose.Schema({
   details: { type: String, required: true }, // 📝 Thông tin chi tiết sản phẩm
   brand: { type: String, default: "" },
   price: { type: Number, default: 0.0 },
-  category: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
   categoryAncestors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }], // 🏷️ Lưu danh mục cha & con
   countInStock: { type: Number, required: true },
   rating: { type: Number, default: 0 },
+  sale: { type: Number, default: 0 }, // % giảm giá
   numReview: { type: Number, default: 0 },
   isFeatured: { type: Boolean, default: false },
-  image: { type: String, default: "" }, // Ảnh chính của sản phẩm
+  image: { type: String, require: true }, // Ảnh chính của sản phẩm
   images: [{ type: String }], // Danh sách ảnh phụ
   dateCreate: { type: Date, default: Date.now },
+  comment:{type:String, default:"Chưa có bình luận"}, 
 });
 
 const Product = mongoose.model("Product", productSchema);

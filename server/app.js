@@ -28,7 +28,7 @@ mongoose
     console.log("Kết nối database đã sẵn sàng...");
     //server
     app.listen(process.env.PORT, () => {
-      console.log(`server đang chạy http:/localhost:${process.env.PORT}`);
+      console.log(`server đang chạy http://localhost:${process.env.PORT}`);
     });
   })
   .catch((err) => {
