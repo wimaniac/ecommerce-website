@@ -6,6 +6,7 @@ const Category = require("../models/category");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { validateCategories } = require("../utils/validation");
 
 // Cấu hình Cloudinary
 cloudinary.config({
@@ -27,118 +28,165 @@ const upload = multer({ storage: storage });
 // 📌 Lấy tất cả sản phẩm
 router.get("/", async (req, res) => {
   try {
-      const products = await Product.find().populate("categoryAncestors");
-      res.status(200).json(products);
+    const products = await Product.find()
+      .populate({
+        path: "categoryAncestors",
+        populate: { path: "subcategories" }, // ✅ Load danh mục con
+      })
+      .populate("brand");
+
+    res.status(200).json(products);
   } catch (err) {
-      res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Lỗi server", error: err.message });
   }
 });
-
 
 // 📌 Lấy sản phẩm theo ID
 router.get("/:id", async (req, res) => {
   try {
-      const product = await Product.findById(req.params.id).populate('categoryAncestors');
-      if (!product) {
-          return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
-      }
-      res.status(200).json(product);
+    const product = await Product.findById(req.params.id)
+      .populate({
+        path: "categoryAncestors",
+        populate: { path: "subcategories" }, // ✅ Load danh mục con
+      })
+      .populate("brand");
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Không tìm thấy sản phẩm" });
+    }
+    res.status(200).json(product);
   } catch (err) {
-      res.status(500).json({ success: false, message: "Lỗi server", error: err.message });
+    res
+      .status(500)
+      .json({ success: false, message: "Lỗi server", error: err.message });
   }
 });
 
-async function validateCategories(categories, res) {
-  for (let catId of categories) {
-      if (!mongoose.Types.ObjectId.isValid(catId)) {
-          res.status(400).json({ success: false, message: `Danh mục không hợp lệ: ${catId}` });
-          return false;
-      }
-      const category = await Category.findById(catId);
-      if (!category) {
-          res.status(400).json({ success: false, message: `Danh mục không tồn tại: ${catId}` });
-          return false;
-      }
-  }
-  return true;
-}
-
-
-router.post("/", upload.fields([{ name: "image", maxCount: 1 }, { name: "images", maxCount: 5 }]), async (req, res) => {
+router.post("/", upload.fields([
+  { name: "image", maxCount: 1 },
+  { name: "images", maxCount: 5 },
+]), async (req, res) => {
   try {
-      const { name, description, details, brand, price, categoryAncestors, countInStock, sale } = req.body;
+    console.log("🔄 Dữ liệu nhận từ frontend:", req.body);
+    console.log("📂 File upload:", req.files);
 
-      if (!name || name.trim() === "") {
-          return res.status(400).json({ success: false, message: "Tên sản phẩm là bắt buộc" });
-      }
+    const { name, description, details, price, countInStock, sale, brand, categoryAncestors } = req.body;
 
-      // Xử lý categoryAncestors tùy loại request
-      let categories = typeof categoryAncestors === "string"
-          ? categoryAncestors.split(",").map(id => id.trim())
-          : categoryAncestors;
+    if (!name || !price || !categoryAncestors || !brand || !details) {
+      return res.status(400).json({ success: false, message: "Thiếu thông tin sản phẩm!" });
+    }
 
-      if (!(await validateCategories(categories, res))) return;
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ success: false, message: "Ảnh chính là bắt buộc!" });
+    }
 
-      const mainImage = req.files["image"] ? req.files["image"][0].path : "";
-      const extraImages = req.files["images"] ? req.files["images"].map(file => file.path) : [];
-
-      const product = new Product({
-          name, description, details, brand, price,
-          categoryAncestors: categories,
-          countInStock, sale,
-          image: mainImage,
-          images: extraImages
-      });
-
-      await product.save();
-      res.status(201).json(product);
-
-  } catch (err) {
-      res.status(500).json({ success: false, message: "Không thể tạo sản phẩm", error: err.message });
-  }
-});
-
-
-router.put("/:id", upload.fields([{ name: "image", maxCount: 1 }, { name: "images", maxCount: 5 }]), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, details, brand, price, categoryAncestors, countInStock, sale } = req.body;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ success: false, message: "ID không hợp lệ" });
-
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
-
-    let categories = typeof categoryAncestors === "string" ? categoryAncestors.split(",").map(id => id.trim()) : categoryAncestors;
-    if (!(await validateCategories(categories, res))) return;
-
-    product.set({ name, description, details, brand, price, categoryAncestors: categories, countInStock, sale });
-
-    if (req.files["image"]) product.image = req.files["image"][0].path;
-    if (req.files["images"]) product.images = req.files["images"].map(file => file.path);
+    const product = new Product({
+      name,
+      description,
+      details,
+      price: Number(price),
+      countInStock: Number(countInStock),
+      sale: Number(sale) || 0,
+      brand: new mongoose.Types.ObjectId(brand),
+      categoryAncestors: Array.isArray(categoryAncestors)
+        ? categoryAncestors.map((id) => new mongoose.Types.ObjectId(id))
+        : [new mongoose.Types.ObjectId(categoryAncestors)],
+      image: req.files.image[0].path,
+      images: req.files.images ? req.files.images.map((file) => file.path) : [],
+    });
 
     await product.save();
-    res.status(200).json({ success: true, message: "Cập nhật sản phẩm thành công", data: product });
+    res.status(201).json(product);
   } catch (err) {
+    console.error("❌ Lỗi khi tạo sản phẩm:", err);
+    res.status(500).json({ success: false, message: "Không thể tạo sản phẩm", error: err.message });
+  }
+});
+
+router.put("/:id", upload.fields([
+  { name: "image", maxCount: 1 },
+  { name: "images", maxCount: 5 },
+]), async (req, res) => {
+  try {
+    console.log("🔄 Dữ liệu nhận từ frontend:", req.body);
+    console.log("📂 File upload:", req.files);
+
+    const { name, description, price, countInStock, sale, brand, categories, subcategories, oldImages } = req.body;
+
+    if (!name || !price || !categories) {
+      return res.status(400).json({ success: false, message: "Thiếu thông tin sản phẩm!" });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
+    }
+
+    product.set({
+      name,
+      description,
+      price,
+      countInStock,
+      sale: sale != null ? sale : 0,
+      brand,
+      categoryAncestors: Array.isArray(categories) ? categories : [categories],
+      subcategories: subcategories 
+        ? (Array.isArray(subcategories) ? subcategories : [subcategories]) // ✅ Đảm bảo subcategories là mảng
+        : [],
+    });
+
+    // ✅ Giữ nguyên ảnh cũ nếu không thay đổi
+    if (req.files?.image) {
+      product.image = req.files.image[0].path;
+    }
+
+    let updatedImages = oldImages ? JSON.parse(oldImages) : product.images;
+    if (req.files?.images) {
+      updatedImages = [...updatedImages, ...req.files.images.map((file) => file.path)];
+    }
+    product.images = updatedImages;
+
+    await product.save();
+    res.status(200).json({ success: true, message: "Cập nhật sản phẩm thành công!", product });
+  } catch (err) {
+    console.error("❌ Lỗi cập nhật sản phẩm:", err);
     res.status(500).json({ success: false, message: "Lỗi khi cập nhật sản phẩm", error: err.message });
   }
 });
+
+
+
+
+
 
 // 📌 Xóa sản phẩm
 router.delete("/:id", async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: "ID không hợp lệ" });
+      return res
+        .status(400)
+        .json({ success: false, message: "ID không hợp lệ" });
     }
 
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Không tìm thấy sản phẩm" });
     }
 
     res.status(200).json({ success: true, message: "Xóa sản phẩm thành công" });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Lỗi khi xóa sản phẩm", error: err.message });
+    console.error("Error deleting product:", err); // Log the error
+    res.status(500).json({
+      success: false,
+      message: "Lỗi khi xóa sản phẩm",
+      error: err.message,
+    });
   }
 });
 
@@ -147,18 +195,22 @@ router.get("/category/:categoryId", async (req, res) => {
   const { categoryId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ success: false, message: "ID danh mục không hợp lệ" });
+    return res
+      .status(400)
+      .json({ success: false, message: "ID danh mục không hợp lệ" });
   }
 
-  const products = await Product.find({ categoryAncestors: categoryId }).populate('categoryAncestors');
+  const products = await Product.find({
+    categoryAncestors: categoryId,
+  }).populate("categoryAncestors");
 
   if (products.length === 0) {
-      return res.status(404).json({ success: false, message: "Không tìm thấy sản phẩm" });
+    return res
+      .status(404)
+      .json({ success: false, message: "Không tìm thấy sản phẩm" });
   }
 
   res.status(200).json({ success: true, data: products });
 });
 
-
 module.exports = router;
-  
